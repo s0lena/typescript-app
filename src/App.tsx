@@ -1,13 +1,40 @@
+import { useState } from 'react';
 import { Activity } from './components/Activity'
 import './App.css'
+import { Form, FormDataStructure } from './components/Form';
+
+interface ActivityDataStructure {
+  accessibility:  number
+  activity: string;
+  key: string;
+  link: string;
+  participants: number;
+  price: number;
+  type: string;
+}
+
 
 function App() {
+  const [activityData, setActivityData] = useState<ActivityDataStructure>();
+  const fetchData = async (type: string) => {
+    const result = await fetch(`http://www.boredapi.com/api/activity?type=${type}`);
+    const data = await result.json();
+    setActivityData(data);
+  }
+
+  const handleSubmitForm = (data: FormDataStructure) => {
+    fetchData(data.type);
+  };
+
   return (
     <>
-      <Activity 
-      nameOfActivity='Learn React' type="education" participants={40} price={1}/> // Error: Type '{}' is missing the following properties from
-      type 'ActivityProps': nameOfActivity, type, participants, price ts(2739)
-    </>
+    <Form onSubmitForm={handleSubmitForm}/>
+      {activityData && (<Activity 
+      nameOfActivity={activityData.activity}
+      type={activityData.type}
+      participants={activityData.participants}
+      price={activityData.price}/> 
+    )}</>
   );
 }
 
